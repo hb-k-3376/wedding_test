@@ -7,7 +7,6 @@ import { AutoMusic } from './components/AutoMusic';
 export default function Page() {
   const [data, setData] = useState<WeddingData | null>(null);
   const [token, setToken] = useState<string>('');
-  const [folderId, setFolderId] = useState<string>('');
   const [link, setLink] = useState<string>('');
 
   // 공개 JSON 불러오기
@@ -52,7 +51,6 @@ export default function Page() {
         body: JSON.stringify({ accessToken: token }),
       });
       const json = await res.json();
-      if (json.id) setFolderId(json.id);
       if (json.id) setLink(json.webViewLink);
 
       alert('폴더 생성 완료: ' + json.id);

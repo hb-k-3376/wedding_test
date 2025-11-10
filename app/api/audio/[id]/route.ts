@@ -5,18 +5,20 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: fileId } = await params;
-  // 구글 드라이브의 다운로드용 URL로 요청
+  console.log('Requested file ID:', fileId); // 로그 추가
 
   const driveRes = await fetch(
     `https://drive.google.com/uc?export=download&id=${fileId}`,
     { method: 'GET' }
   );
 
+  console.log('Drive response status:', driveRes.status); // 로그 추가
+  console.log('Content-Type:', driveRes.headers.get('content-type')); // 로그 추가
+
   if (!driveRes.ok) {
     return NextResponse.json({ error: 'Not Found' }, { status: 404 });
   }
 
-  // 스트림, 타입 전달
   const headers = new Headers(driveRes.headers);
   return new NextResponse(driveRes.body, {
     status: 200,
