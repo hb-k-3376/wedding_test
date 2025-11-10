@@ -21,7 +21,7 @@ export default function Page() {
   const handleAuth = () => {
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI!,
+      redirect_uri: process.env.NEXT_PUBLIC_SITE_URL!,
       response_type: 'token',
       scope:
         'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive',
@@ -64,15 +64,16 @@ export default function Page() {
 
   // 파일 생성
   const handleUploadFile = async () => {
-    if (!token || !folderId) return alert('폴더 생성 후 업로드 가능합니다.');
+    if (!token) return alert('폴더 생성 후 업로드 가능합니다.');
     try {
       const res = await fetch('/api/upload-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessToken: token, folderId }),
+        body: JSON.stringify({ accessToken: token }),
       });
       const json = await res.json();
-      alert('파일 업로드 완료: ' + json.id);
+
+      alert('파일 업로드 완료: ' + json.name);
     } catch (e) {
       console.error(e);
       alert('업로드 실패');
@@ -100,7 +101,6 @@ export default function Page() {
 
           <div className="mt-4 flex gap-2">
             {data.images.map((id) => {
-              console.log('id', id);
               return (
                 <Image
                   key={id}
@@ -139,7 +139,6 @@ export default function Page() {
             <button
               className="px-4 py-2 bg-yellow-500 cursor-pointer text-black rounded"
               onClick={handleUploadFile}
-              disabled={!folderId}
             >
               파일 업로드
             </button>
