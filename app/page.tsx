@@ -18,14 +18,18 @@ export default function Page() {
 
   // 로그인
   const handleAuth = () => {
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+    console.log('🔍 실제 redirect_uri:', redirectUrl); // 로그 추가
+
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      redirect_uri: process.env.NEXT_PUBLIC_SITE_URL!,
+      redirect_uri: redirectUrl,
       response_type: 'token',
       scope:
         'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive',
     });
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+    console.log('🔍 전체 URL:', url); // 전체 URL도 확인
     const popup = window.open(url, '_blank', 'width=500,height=600');
 
     const listener = setInterval(() => {
