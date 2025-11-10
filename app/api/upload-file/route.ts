@@ -1,29 +1,26 @@
-import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { NextRequest, NextResponse } from 'next/server';
+import type { NextApiResponse } from 'next';
 
-export async function POST(req: Request) {
-  const { accessToken, folderId } = await req.json();
-  if (!accessToken || !folderId)
-    return NextResponse.json({ error: 'missing data' }, { status: 400 });
+export const runtime = 'nodejs';
+
+export async function GET(req: NextRequest, res: NextApiResponse) {
+  const fileId = req.nextUrl.searchParams.get('id');
+  if (!fileId) return res.status(400).json({ error: 'no file id' });
 
   try {
-    const oauth2Client = new google.auth.OAuth2();
-    oauth2Client.setCredentials({ access_token: accessToken });
-    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    const drive = google.drive({ version: 'v3', auth: process.env.GOOGLE_API_KEY });
+    const driveResponse = await drive.files.get(
+      { fileId, alt: 'media' },
+      { responseType: 'stream' }
+    );
 
-    // 샘플 JSON 업로드
-    const fileRes = await drive.files.create({
-      requestBody: { name: 'wedding-data.json', parents: [folderId] },
-      media: {
-        mimeType: 'application/json',
-        body: JSON.stringify({ test: '테스트 파일' }),
-      },
-      fields: 'id, name',
-    });
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
 
-    return NextResponse.json(fileRes.data);
+    driveResponse.data.pipe(res);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'ㅎ므..';
+    const msg = e instanceof Error ? e.message : '흠';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

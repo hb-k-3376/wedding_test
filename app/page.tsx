@@ -1,20 +1,23 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { WeddingData } from './types/wedding';
+import Image from 'next/image';
+import { AutoMusic } from './components/AutoMusic';
 
 export default function Page() {
   const [data, setData] = useState<WeddingData | null>(null);
   const [token, setToken] = useState<string>('');
   const [folderId, setFolderId] = useState<string>('');
+  const [link, setLink] = useState<string>('');
 
-  // 공개 JSON 항상 불러오기
+  // 공개 JSON 불러오기
   useEffect(() => {
     fetch('/api/public-json')
       .then((res) => res.json())
       .then((json) => setData(json));
   }, []);
 
+  // 로그인
   const handleAuth = () => {
     const params = new URLSearchParams({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
@@ -39,6 +42,7 @@ export default function Page() {
     }, 500);
   };
 
+  // 폴더 생성
   const handleCreateFolder = async () => {
     if (!token) return alert('로그인이 필요합니다.');
     try {
@@ -49,6 +53,8 @@ export default function Page() {
       });
       const json = await res.json();
       if (json.id) setFolderId(json.id);
+      if (json.id) setLink(json.webViewLink);
+
       alert('폴더 생성 완료: ' + json.id);
     } catch (e) {
       console.error(e);
@@ -56,6 +62,7 @@ export default function Page() {
     }
   };
 
+  // 파일 생성
   const handleUploadFile = async () => {
     if (!token || !folderId) return alert('폴더 생성 후 업로드 가능합니다.');
     try {
@@ -106,6 +113,10 @@ export default function Page() {
               );
             })}
           </div>
+
+          <div className="mt-4">
+            <AutoMusic src={`/api/audio/${data.backgroundMusic}`} />
+          </div>
         </div>
       ) : (
         <p>로딩 중...</p>
@@ -120,13 +131,13 @@ export default function Page() {
         {token && (
           <>
             <button
-              className="px-4 py-2 bg-green-500 text-white rounded"
+              className="px-4 py-2 bg-green-500 cursor-pointer text-white rounded"
               onClick={handleCreateFolder}
             >
               폴더 생성
             </button>
             <button
-              className="px-4 py-2 bg-yellow-500 text-black rounded"
+              className="px-4 py-2 bg-yellow-500 cursor-pointer text-black rounded"
               onClick={handleUploadFile}
               disabled={!folderId}
             >
@@ -135,6 +146,19 @@ export default function Page() {
           </>
         )}
       </div>
+      {link && (
+        <p className="mt-10">
+          생성된 내 폴더 링크 :{' '}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            {link}
+          </a>
+        </p>
+      )}
     </div>
   );
 }

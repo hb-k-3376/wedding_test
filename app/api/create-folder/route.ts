@@ -17,12 +17,29 @@ export async function POST(req: Request) {
         name: 'wedding_test',
         mimeType: 'application/vnd.google-apps.folder',
       },
-      fields: 'id, name',
+      fields: 'id, name, webViewLink',
+    });
+
+    const folderId = folderRes.data.id;
+
+    if (!folderId) {
+      return NextResponse.json(
+        { error: '폴더 ID를 가져올 수 없습니다.' },
+        { status: 500 }
+      );
+    }
+
+    await drive.permissions.create({
+      fileId: folderId,
+      requestBody: {
+        role: 'reader', // 읽기 권한
+        type: 'anyone', // 누구나 접근 가능
+      },
     });
 
     return NextResponse.json(folderRes.data);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'ㅎ므..';
+    const msg = e instanceof Error ? e.message : '흠..';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -16,7 +16,7 @@ export async function GET() {
     const data = await res.json();
     return NextResponse.json(data);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'ㅎ므..';
+    const msg = e instanceof Error ? e.message : '흠';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
