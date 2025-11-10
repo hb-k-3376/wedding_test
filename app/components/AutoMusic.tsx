@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   src: string;
@@ -8,6 +8,12 @@ interface Props {
 export const AutoMusic = ({ src }: Props) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.1;
+    }
+  }, []);
 
   // 볼륨 아이콘 클릭
   const togglePlay = () => {
