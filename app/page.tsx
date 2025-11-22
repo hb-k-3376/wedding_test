@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { WeddingData } from './types/wedding';
+import { WeddingData } from '../types/wedding';
 import Image from 'next/image';
-import { AutoMusic } from './components/AutoMusic';
+import { AutoMusic } from '../components/AutoMusic';
 
 export default function Page() {
   const [data, setData] = useState<WeddingData | null>(null);
